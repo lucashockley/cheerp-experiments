@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
 
   let cxConsole: HTMLPreElement;
+  let fileInput: HTMLInputElement;
 
   onMount(async () => {
     const cx = await CheerpXApp.create({
@@ -36,6 +37,17 @@
       gid: 1000,
     });
   });
+
+  async function handleFileUpload() {
+    if (!fileInput?.files) return;
+
+    for (const file of fileInput.files) {
+      const data = await file.arrayBuffer();
+      const a = new Uint8Array(data);
+
+      cheerpOSAddStringFile(`/str/${file.name}`, a);
+    }
+  }
 </script>
 
 <svelte:head>
@@ -43,5 +55,13 @@
     src="https://cheerpxdemos.leaningtech.com/publicdeploy/20240501_137/cx.js"
   ></script>
 </svelte:head>
+
+<label for="file-upload">Upload Files to the Filesystem</label>
+<input
+  bind:this={fileInput}
+  on:change={handleFileUpload}
+  type="file"
+  id="file-upload"
+/>
 
 <pre bind:this={cxConsole}></pre>
